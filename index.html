@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolyTrade — As Apostas do Vinnie</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold:     #C9A84C;
+    --gold-dim: #8a6f2e;
+    --red:      #B22222;
+    --green:    #2E7D32;
+    --green-lit:#43A047;
+    --bg:       #0D0D0D;
+    --surface:  #1A1A1A;
+    --card:     #222222;
+    --border:   #333333;
+    --text:     #F0EDE6;
+    --muted:    #888888;
+    --bebas:    'Bebas Neue', sans-serif;
+    --inter:    'Inter', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--inter);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── TICKER ── */
+  .ticker-wrap {
+    background: var(--gold);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 6px 0;
+  }
+  .ticker {
+    display: inline-block;
+    animation: ticker 28s linear infinite;
+    font-family: var(--bebas);
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #0D0D0D;
+  }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: var(--bebas);
+    letter-spacing: 6px;
+    font-size: 13px;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  .hero-title {
+    font-family: var(--bebas);
+    font-size: clamp(52px, 10vw, 110px);
+    line-height: 0.92;
+    letter-spacing: 2px;
+    color: var(--text);
+  }
+  .hero-title span {
+    color: var(--gold);
+    display: block;
+  }
+  .hero-sub {
+    margin-top: 20px;
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin: 40px auto;
+    max-width: 700px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .stat-item {
+    flex: 1;
+    text-align: center;
+    padding: 20px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: var(--bebas);
+    font-size: 38px;
+    color: var(--gold);
+    line-height: 1;
+    display: block;
+  }
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title {
+    font-family: var(--bebas);
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: var(--text);
+  }
+  .section-tag {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  /* ── BET CARDS ── */
+  .bet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+  .bet-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    cursor: pointer;
+    transition: border-color .2s, transform .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .bet-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .25s;
+  }
+  .bet-card:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
+  .bet-card:hover::before { transform: scaleX(1); }
+  .bet-card.active {
+    border-color: var(--gold);
+    background: #1e1a10;
+  }
+  .bet-card.active::before { transform: scaleX(1); }
+
+  .bet-icon { font-size: 32px; margin-bottom: 12px; display: block; }
+  .bet-name {
+    font-family: var(--bebas);
+    font-size: 22px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .bet-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .bet-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 2px;
+    background: var(--gold);
+    color: #0D0D0D;
+    font-weight: 700;
+  }
+
+  /* ── FORM ── */
+  .bet-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 28px;
+    margin-bottom: 40px;
+    display: none;
+  }
+  .bet-form.visible { display: block; }
+  .form-title {
+    font-family: var(--bebas);
+    font-size: 24px;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+    color: var(--gold);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .form-row.full { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .form-input, .form-select {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: var(--inter);
+    font-size: 15px;
+    padding: 10px 14px;
+    transition: border-color .2s;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .form-input::placeholder { color: #555; }
+
+  .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
+  .radio-opt {
+    flex: 1; min-width: 80px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all .2s;
+    user-select: none;
+  }
+  .radio-opt:hover { border-color: var(--gold-dim); }
+  .radio-opt.selected { border-color: var(--gold); background: #1e1a10; color: var(--gold); }
+
+  .submit-btn {
+    background: var(--gold);
+    color: #0D0D0D;
+    border: none;
+    border-radius: 4px;
+    font-family: var(--bebas);
+    font-size: 20px;
+    letter-spacing: 2px;
+    padding: 14px 32px;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    margin-top: 8px;
+    width: 100%;
+  }
+  .submit-btn:hover { background: #d4b45a; }
+  .submit-btn:active { transform: scale(0.98); }
+
+  /* ── LEADERBOARD ── */
+  .board-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .board-table th {
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .board-table td {
+    padding: 14px;
+    font-size: 14px;
+    border-bottom: 1px solid #1f1f1f;
+    vertical-align: middle;
+  }
+  .board-table tr:hover td { background: var(--surface); }
+
+  .rank-num {
+    font-family: var(--bebas);
+    font-size: 22px;
+    color: var(--muted);
+    width: 40px;
+  }
+  .rank-1 .rank-num { color: var(--gold); }
+  .rank-2 .rank-num { color: #A8A8A8; }
+  .rank-3 .rank-num { color: #CD7F32; }
+
+  .player-name {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .bet-type-badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+  .badge-casamento { border-color: var(--gold-dim); color: var(--gold); }
+  .badge-duracao   { border-color: #4a7a8a; color: #7ec8e3; }
+  .badge-termino   { border-color: #6a3a3a; color: #e07070; }
+
+  .bet-value {
+    font-family: var(--bebas);
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+
+  .status-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .status-active  { background: rgba(46,125,50,.2); color: var(--green-lit); }
+  .status-winner  { background: rgba(201,168,76,.2); color: var(--gold); }
+  .status-pending { background: rgba(136,136,136,.1); color: var(--muted); }
+
+  .delete-btn {
+    background: none;
+    border: 1px solid #333;
+    border-radius: 3px;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .delete-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-icon { font-size: 48px; display: block; margin-bottom: 12px; }
+  .empty-title { font-family: var(--bebas); font-size: 24px; margin-bottom: 8px; color: #555; }
+  .empty-sub { font-size: 13px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    background: var(--gold);
+    color: #0D0D0D;
+    padding: 14px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all .3s cubic-bezier(.34,1.56,.64,1);
+    z-index: 999;
+    max-width: 300px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.8);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 900;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px;
+    max-width: 440px;
+    width: 90%;
+    transform: scale(.95);
+    transition: transform .2s;
+  }
+  .modal-overlay.open .modal { transform: scale(1); }
+  .modal-title {
+    font-family: var(--bebas);
+    font-size: 28px;
+    margin-bottom: 12px;
+    color: var(--gold);
+  }
+  .modal-body { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+  .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+  .btn-cancel {
+    background: none; border: 1px solid var(--border);
+    color: var(--muted); border-radius: 4px;
+    padding: 10px 20px; cursor: pointer; font-size: 14px;
+    transition: border-color .2s;
+  }
+  .btn-cancel:hover { border-color: var(--muted); }
+  .btn-confirm {
+    background: var(--red); border: none; color: white;
+    border-radius: 4px; padding: 10px 20px;
+    cursor: pointer; font-size: 14px; font-weight: 600;
+    transition: background .2s;
+  }
+  .btn-confirm:hover { background: #cc2929; }
+
+
+  /* ── CREATE MARKET MODAL ── */
+  .create-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 950;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s;
+    padding: 20px;
+  }
+  .create-modal-overlay.open { opacity: 1; pointer-events: all; }
+  .create-modal {
+    background: var(--surface);
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    padding: 32px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(.95);
+    transition: transform .2s;
+  }
+  .create-modal-overlay.open .create-modal { transform: scale(1); }
+  .create-modal-title {
+    font-family: var(--bebas);
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .create-modal-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .type-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .type-opt {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    user-select: none;
+  }
+  .type-opt .type-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+  .type-opt .type-name { font-family: var(--bebas); font-size: 16px; letter-spacing: 1px; }
+  .type-opt .type-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .type-opt:hover { border-color: var(--gold-dim); }
+  .type-opt.selected { border-color: var(--gold); background: #1e1a10; }
+  .type-opt.selected .type-name { color: var(--gold); }
+
+  .options-builder { margin-top: 8px; }
+  .option-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .option-row .form-input { flex: 1; }
+  .remove-opt-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 4px;
+    width: 34px; height: 38px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all .2s;
+    flex-shrink: 0;
+  }
+  .remove-opt-btn:hover { border-color: var(--red); color: var(--red); }
+  .add-option-btn {
+    background: none;
+    border: 1px dashed var(--border);
+    color: var(--muted);
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    width: 100%;
+    transition: all .2s;
+    margin-top: 4px;
+  }
+  .add-option-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  /* ── CUSTOM MARKET CARDS ── */
+  .custom-market-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+  }
+  .custom-market-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .custom-market-question {
+    font-family: var(--bebas);
+    font-size: 20px;
+    letter-spacing: 1px;
+    line-height: 1.2;
+    flex: 1;
+  }
+  .custom-market-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .custom-market-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .bet-on-custom-btn {
+    background: var(--gold);
+    color: #0D0D0D;
+    border: none;
+    border-radius: 4px;
+    font-family: var(--bebas);
+    font-size: 15px;
+    letter-spacing: 1px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background .2s;
+    white-space: nowrap;
+  }
+  .bet-on-custom-btn:hover { background: #d4b45a; }
+
+  /* inline bet form inside custom market card */
+  .custom-bet-form {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    margin-top: 4px;
+    display: none;
+  }
+  .custom-bet-form.open { display: block; }
+  .custom-bet-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  .custom-bet-row .form-group { flex: 1; min-width: 140px; }
+  .custom-bet-submit {
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-family: var(--bebas);
+    font-size: 16px;
+    letter-spacing: 1px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background .2s;
+    height: 40px;
+    align-self: flex-end;
+    white-space: nowrap;
+  }
+  .custom-bet-submit:hover { background: var(--green-lit); }
+
+  /* bets list inside custom market */
+  .custom-bets-list {
+    margin-top: 14px;
+    border-top: 1px solid #1f1f1f;
+    padding-top: 12px;
+  }
+  .custom-bet-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 13px;
+  }
+  .custom-bet-item:last-child { border-bottom: none; }
+  .cbi-name { font-weight: 600; min-width: 90px; }
+  .cbi-value { font-family: var(--bebas); font-size: 16px; color: var(--gold); flex: 1; }
+  .cbi-comment { color: var(--muted); font-style: italic; flex: 2; }
+  .cbi-delete {
+    background: none; border: 1px solid #333;
+    border-radius: 3px; color: var(--muted);
+    font-size: 11px; padding: 3px 7px;
+    cursor: pointer; transition: all .2s;
+  }
+  .cbi-delete:hover { border-color: var(--red); color: var(--red); }
+
+  .bet-card-create {
+    border-style: dashed;
+    border-color: var(--gold-dim);
+  }
+  .bet-card-create:hover { border-color: var(--gold); border-style: solid; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 32px 20px;
+    color: #3a3a3a;
+    font-size: 12px;
+    border-top: 1px solid #1a1a1a;
+    letter-spacing: 1px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 560px) {
+    .form-row { grid-template-columns: 1fr; }
+    .stats-bar { flex-direction: column; }
+    .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+    .stat-item:last-child { border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <span class="ticker">
+    🎲 APOSTAS ABERTAS &nbsp;·&nbsp; QUEM VAI CASAR? QUANDO VAI CASAR? QUANTO DURA? &nbsp;·&nbsp; VINNIE WATCH 2024 &nbsp;·&nbsp; COLOQUE SUA APOSTA &nbsp;·&nbsp; ODDS NÃO INCLUSAS &nbsp;·&nbsp; RESPONSABILIDADE É SUA &nbsp;·&nbsp; 🎲 APOSTAS ABERTAS &nbsp;·&nbsp; QUEM VAI CASAR? QUANDO VAI CASAR? QUANTO DURA? &nbsp;·&nbsp; VINNIE WATCH 2024 &nbsp;·&nbsp; COLOQUE SUA APOSTA &nbsp;·&nbsp; ODDS NÃO INCLUSAS &nbsp;·&nbsp; RESPONSABILIDADE É SUA &nbsp;·&nbsp;
+  </span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <p class="hero-eyebrow">Mercado de apostas oficial</p>
+  <h1 class="hero-title">POLY<span>TRADE</span></h1>
+  <p class="hero-sub">O único mercado sério sobre o futuro sentimental do Vinnie. Aposte com responsabilidade. Ou não.</p>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar" id="stats-bar">
+  <div class="stat-item">
+    <span class="stat-num" id="stat-total">0</span>
+    <span class="stat-label">Apostas</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num" id="stat-apostadores">0</span>
+    <span class="stat-label">Apostadores</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num" id="stat-mercados">3</span>
+    <span class="stat-label">Mercados</span>
+  </div>
+</div>
+
+<!-- SECTION: ESCOLHA -->
+<div class="section">
+  <div class="section-header">
+    <h2 class="section-title">Escolha o mercado</h2>
+    <span class="section-tag">3 disponíveis</span>
+  </div>
+
+  <div class="bet-grid">
+    <div class="bet-card" onclick="selectMarket('casamento')" id="card-casamento">
+      <span class="bet-icon">💍</span>
+      <div class="bet-name">Ano do Casamento</div>
+      <div class="bet-desc">Em que ano o Vinnie vai passar a aliança? Vence quem chegar mais perto.</div>
+      <span class="bet-badge">Numérico</span>
+    </div>
+    <div class="bet-card" onclick="selectMarket('duracao')" id="card-duracao">
+      <span class="bet-icon">⏳</span>
+      <div class="bet-name">Duração do Namoro</div>
+      <div class="bet-desc">Quantos meses esse namoro vai durar? Vence quem chegar mais perto do real.</div>
+      <span class="bet-badge">Numérico</span>
+    </div>
+    <div class="bet-card" onclick="selectMarket('termino')" id="card-termino">
+      <span class="bet-icon">💔</span>
+      <div class="bet-name">Quem Termina Primeiro</div>
+      <div class="bet-desc">Se rolar um término, quem vai dar o pé? Vence quem acertar na mosca.</div>
+      <span class="bet-badge">Exato</span>
+    </div>
+    <div class="bet-card bet-card-create" onclick="openCreateMarket()" id="card-criar">
+      <span class="bet-icon">✏️</span>
+      <div class="bet-name">Criar Nova Aposta</div>
+      <div class="bet-desc">Crie seu próprio mercado. Defina a pergunta, o tipo e as opções — seus amigos apostam.</div>
+      <span class="bet-badge" style="background:var(--surface);color:var(--gold);border:1px solid var(--gold-dim)">Livre</span>
+    </div>
+  </div>
+
+  <!-- CUSTOM MARKETS SECTION -->
+  <div id="custom-markets-section" style="display:none; margin-bottom:40px">
+    <div class="section-header">
+      <h2 class="section-title">Apostas criadas pelos amigos</h2>
+      <span class="section-tag" id="custom-markets-count">0 mercados</span>
+    </div>
+    <div id="custom-markets-list"></div>
+  </div>
+
+  <!-- FORM -->
+  <div class="bet-form" id="bet-form">
+    <div class="form-title" id="form-title">Colocar Aposta</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Seu nome</label>
+        <input class="form-input" id="input-nome" type="text" placeholder="Ex: Zé da Esquina" maxlength="30">
+      </div>
+      <div class="form-group" id="group-ano" style="display:none">
+        <label class="form-label">Ano do casamento</label>
+        <input class="form-input" id="input-ano" type="number" placeholder="Ex: 2027" min="2024" max="2050">
+      </div>
+      <div class="form-group" id="group-meses" style="display:none">
+        <label class="form-label">Duração (meses)</label>
+        <input class="form-input" id="input-meses" type="number" placeholder="Ex: 18" min="1" max="600">
+      </div>
+      <div class="form-group" id="group-termino" style="display:none">
+        <label class="form-label">Quem termina?</label>
+        <div class="radio-group" id="radio-termino">
+          <div class="radio-opt" onclick="selectRadio(this, 'termino')" data-value="vinnie">🧑 Vinnie</div>
+          <div class="radio-opt" onclick="selectRadio(this, 'termino')" data-value="ela">💁 Ela</div>
+          <div class="radio-opt" onclick="selectRadio(this, 'termino')" data-value="mutuo">🤝 Mútuo</div>
+          <div class="radio-opt" onclick="selectRadio(this, 'termino')" data-value="nenhum">♾️ Não termina</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="form-label">Comentário (opcional)</label>
+        <input class="form-input" id="input-comentario" type="text" placeholder="Ex: Ele vai aguentar no máximo até o verão" maxlength="80">
+      </div>
+    </div>
+    <button class="submit-btn" onclick="submitBet()">⚡ CONFIRMAR APOSTA</button>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="section-header" style="margin-top:20px">
+    <h2 class="section-title">Apostas registradas</h2>
+    <span class="section-tag" id="count-tag">0 apostas</span>
+  </div>
+
+  <div id="board-container">
+    <div class="empty" id="empty-state">
+      <span class="empty-icon">🎲</span>
+      <div class="empty-title">Nenhuma aposta ainda</div>
+      <div class="empty-sub">Seja o primeiro a colocar sua fé no futuro do Vinnie</div>
+    </div>
+    <table class="board-table" id="board-table" style="display:none">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Apostador</th>
+          <th>Mercado</th>
+          <th>Aposta</th>
+          <th>Comentário</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="board-body"></tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- CREATE MARKET MODAL -->
+<div class="create-modal-overlay" id="create-modal-overlay">
+  <div class="create-modal">
+    <div class="create-modal-title">✏️ Criar nova aposta</div>
+    <div class="create-modal-sub">Defina sua pergunta e o tipo de resposta. Seus amigos vão apostar no mercado que você criar.</div>
+
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">Seu nome (criador)</label>
+      <input class="form-input" id="cm-creator" type="text" placeholder="Ex: Marquinhos" maxlength="30">
+    </div>
+
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">A pergunta da aposta</label>
+      <input class="form-input" id="cm-question" type="text" placeholder="Ex: Quantos filhos o Vinnie vai ter?" maxlength="100">
+    </div>
+
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">Tipo de resposta</label>
+      <div class="type-toggle">
+        <div class="type-opt selected" id="type-numerico" onclick="selectType('numerico')">
+          <span class="type-icon">🔢</span>
+          <div class="type-name">Numérico</div>
+          <div class="type-desc">Número livre. Vence quem chegar mais perto.</div>
+        </div>
+        <div class="type-opt" id="type-opcoes" onclick="selectType('opcoes')">
+          <span class="type-icon">☑️</span>
+          <div class="type-name">Opções</div>
+          <div class="type-desc">Lista de escolhas. Vence quem acertar.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="cm-unit-group" class="form-group" style="margin-bottom:16px">
+      <label class="form-label">Unidade (opcional)</label>
+      <input class="form-input" id="cm-unit" type="text" placeholder="Ex: anos, meses, kg, pontos…" maxlength="20">
+    </div>
+
+    <div id="cm-options-group" style="display:none; margin-bottom:16px">
+      <label class="form-label" style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px">Opções de resposta</label>
+      <div class="options-builder" id="options-builder">
+        <div class="option-row"><input class="form-input" type="text" placeholder="Opção 1" maxlength="40"><button class="remove-opt-btn" onclick="removeOption(this)">×</button></div>
+        <div class="option-row"><input class="form-input" type="text" placeholder="Opção 2" maxlength="40"><button class="remove-opt-btn" onclick="removeOption(this)">×</button></div>
+      </div>
+      <button class="add-option-btn" onclick="addOption()">+ Adicionar opção</button>
+    </div>
+
+    <div class="form-group" style="margin-bottom:24px">
+      <label class="form-label">Descrição / regra de vitória (opcional)</label>
+      <input class="form-input" id="cm-desc" type="text" placeholder="Ex: Vence quem chegar mais perto do número real" maxlength="100">
+    </div>
+
+    <div style="display:flex;gap:12px">
+      <button class="btn-cancel" style="flex:1" onclick="closeCreateMarket()">Cancelar</button>
+      <button class="submit-btn" style="flex:2;margin-top:0" onclick="saveCustomMarket()">🚀 PUBLICAR MERCADO</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  POLYTRADE &nbsp;·&nbsp; VINNIE EDITION &nbsp;·&nbsp; APOSTAS SEM FINS LUCRATIVOS &nbsp;·&nbsp; APENAS ENTRE AMIGOS
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL CONFIRM DELETE -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">Remover aposta?</div>
+    <div class="modal-body">Tem certeza que quer remover essa aposta? Isso não pode ser desfeito e o apostador vai perder sua posição no ranking.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-confirm" onclick="confirmDelete()">Remover</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── STATE ──────────────────────────────────────────────────────────────────
+  let bets = JSON.parse(localStorage.getItem('polytrade_bets') || '[]');
+  let customMarkets = JSON.parse(localStorage.getItem('polytrade_custom_markets') || '[]');
+  let currentMarket = null;
+  let selectedRadios = {};
+  let deleteIndex = null;
+  let currentCreateType = 'numerico';
+
+  // ── MARKET SELECTION (original 3) ─────────────────────────────────────────
+  function selectMarket(market) {
+    currentMarket = market;
+    ['casamento','duracao','termino'].forEach(m => {
+      document.getElementById('card-'+m).classList.toggle('active', m === market);
+    });
+    document.getElementById('card-criar').classList.remove('active');
+
+    document.getElementById('group-ano').style.display     = market === 'casamento' ? 'flex' : 'none';
+    document.getElementById('group-meses').style.display   = market === 'duracao'   ? 'flex' : 'none';
+    document.getElementById('group-termino').style.display = market === 'termino'   ? 'flex' : 'none';
+
+    const titles = {
+      casamento: '💍 Apostar no Ano do Casamento',
+      duracao:   '⏳ Apostar na Duração do Namoro',
+      termino:   '💔 Apostar em Quem Termina'
+    };
+    document.getElementById('form-title').textContent = titles[market];
+    document.getElementById('bet-form').classList.add('visible');
+    document.getElementById('bet-form').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ── RADIO SELECTION ────────────────────────────────────────────────────────
+  function selectRadio(el, group) {
+    document.querySelectorAll(`#radio-${group} .radio-opt`).forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedRadios[group] = el.dataset.value;
+  }
+
+  // ── SUBMIT (original 3) ────────────────────────────────────────────────────
+  function submitBet() {
+    const nome = document.getElementById('input-nome').value.trim();
+    if (!nome) return showToast('⚠️ Coloca seu nome aí, anônimo não conta');
+
+    let betValue = null;
+    let betDisplay = '';
+
+    if (currentMarket === 'casamento') {
+      const ano = parseInt(document.getElementById('input-ano').value);
+      if (!ano || ano < 2024 || ano > 2050) return showToast('⚠️ Coloca um ano válido (2024–2050)');
+      betValue = ano;
+      betDisplay = ano.toString();
+    } else if (currentMarket === 'duracao') {
+      const meses = parseInt(document.getElementById('input-meses').value);
+      if (!meses || meses < 1) return showToast('⚠️ Quantos meses? Pelo menos 1');
+      betValue = meses;
+      betDisplay = meses + (meses === 1 ? ' mês' : ' meses');
+    } else if (currentMarket === 'termino') {
+      if (!selectedRadios['termino']) return showToast('⚠️ Escolhe uma opção aí');
+      const labels = { vinnie: '🧑 Vinnie', ela: '💁 Ela', mutuo: '🤝 Mútuo', nenhum: '♾️ Não termina' };
+      betValue = selectedRadios['termino'];
+      betDisplay = labels[betValue];
+    }
+
+    const comentario = document.getElementById('input-comentario').value.trim();
+    bets.push({
+      id: Date.now(), nome,
+      market: currentMarket,
+      value: betValue, display: betDisplay, comentario,
+      timestamp: new Date().toLocaleDateString('pt-BR'),
+      status: 'active'
+    });
+
+    saveBets();
+    resetForm();
+    renderBoard();
+    updateStats();
+    showToast(`✅ Aposta do ${nome} registrada!`);
+  }
+
+  function resetForm() {
+    document.getElementById('input-nome').value = '';
+    document.getElementById('input-ano').value = '';
+    document.getElementById('input-meses').value = '';
+    document.getElementById('input-comentario').value = '';
+    document.querySelectorAll('.radio-opt').forEach(o => o.classList.remove('selected'));
+    selectedRadios = {};
+  }
+
+  // ── CREATE MARKET MODAL ────────────────────────────────────────────────────
+  function openCreateMarket() {
+    document.getElementById('create-modal-overlay').classList.add('open');
+  }
+  function closeCreateMarket() {
+    document.getElementById('create-modal-overlay').classList.remove('open');
+    resetCreateForm();
+  }
+
+  function selectType(type) {
+    currentCreateType = type;
+    document.getElementById('type-numerico').classList.toggle('selected', type === 'numerico');
+    document.getElementById('type-opcoes').classList.toggle('selected', type === 'opcoes');
+    document.getElementById('cm-unit-group').style.display   = type === 'numerico' ? 'flex' : 'none';
+    document.getElementById('cm-options-group').style.display = type === 'opcoes'   ? 'block' : 'none';
+  }
+
+  function addOption() {
+    const builder = document.getElementById('options-builder');
+    const count = builder.querySelectorAll('.option-row').length + 1;
+    const row = document.createElement('div');
+    row.className = 'option-row';
+    row.innerHTML = `<input class="form-input" type="text" placeholder="Opção ${count}" maxlength="40"><button class="remove-opt-btn" onclick="removeOption(this)">×</button>`;
+    builder.appendChild(row);
+  }
+
+  function removeOption(btn) {
+    const builder = document.getElementById('options-builder');
+    if (builder.querySelectorAll('.option-row').length <= 2) return showToast('⚠️ Mínimo de 2 opções');
+    btn.parentElement.remove();
+  }
+
+  function resetCreateForm() {
+    document.getElementById('cm-creator').value = '';
+    document.getElementById('cm-question').value = '';
+    document.getElementById('cm-unit').value = '';
+    document.getElementById('cm-desc').value = '';
+    const builder = document.getElementById('options-builder');
+    builder.innerHTML = `
+      <div class="option-row"><input class="form-input" type="text" placeholder="Opção 1" maxlength="40"><button class="remove-opt-btn" onclick="removeOption(this)">×</button></div>
+      <div class="option-row"><input class="form-input" type="text" placeholder="Opção 2" maxlength="40"><button class="remove-opt-btn" onclick="removeOption(this)">×</button></div>`;
+    selectType('numerico');
+  }
+
+  function saveCustomMarket() {
+    const creator  = document.getElementById('cm-creator').value.trim();
+    const question = document.getElementById('cm-question').value.trim();
+    const unit     = document.getElementById('cm-unit').value.trim();
+    const desc     = document.getElementById('cm-desc').value.trim();
+
+    if (!creator)  return showToast('⚠️ Coloca seu nome');
+    if (!question) return showToast('⚠️ Escreve a pergunta da aposta');
+
+    let options = [];
+    if (currentCreateType === 'opcoes') {
+      options = Array.from(document.querySelectorAll('#options-builder .option-row input'))
+        .map(i => i.value.trim()).filter(Boolean);
+      if (options.length < 2) return showToast('⚠️ Coloca pelo menos 2 opções');
+    }
+
+    customMarkets.push({
+      id: 'cm_' + Date.now(),
+      creator, question, type: currentCreateType,
+      unit, desc, options,
+      timestamp: new Date().toLocaleDateString('pt-BR'),
+      bets: []
+    });
+
+    saveCustomMarkets();
+    renderCustomMarkets();
+    updateStats();
+    closeCreateMarket();
+    showToast(`🚀 Mercado criado! Seus amigos já podem apostar.`);
+
+    // scroll to custom markets
+    setTimeout(() => {
+      document.getElementById('custom-markets-section').scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+  }
+
+  // ── BET ON CUSTOM MARKET ───────────────────────────────────────────────────
+  function toggleCustomBetForm(marketId) {
+    const form = document.getElementById('cbf-' + marketId);
+    form.classList.toggle('open');
+  }
+
+  function submitCustomBet(marketId) {
+    const market = customMarkets.find(m => m.id === marketId);
+    if (!market) return;
+
+    const nome = document.getElementById('cbn-' + marketId).value.trim();
+    if (!nome) return showToast('⚠️ Coloca seu nome');
+
+    let value = '', display = '';
+
+    if (market.type === 'numerico') {
+      const raw = document.getElementById('cbv-' + marketId).value.trim();
+      if (!raw) return showToast('⚠️ Coloca um valor');
+      value = raw;
+      display = raw + (market.unit ? ' ' + market.unit : '');
+    } else {
+      const sel = document.querySelector(`#cbr-${marketId} .radio-opt.selected`);
+      if (!sel) return showToast('⚠️ Escolhe uma opção');
+      value = sel.dataset.value;
+      display = sel.dataset.value;
+    }
+
+    const comment = document.getElementById('cbc-' + marketId).value.trim();
+
+    market.bets.push({
+      id: Date.now(), nome, value, display, comment,
+      timestamp: new Date().toLocaleDateString('pt-BR')
+    });
+
+    saveCustomMarkets();
+    renderCustomMarkets();
+    updateStats();
+    showToast(`✅ Aposta registrada em "${market.question.substring(0,30)}…"`);
+  }
+
+  function deleteCustomBet(marketId, betId) {
+    const market = customMarkets.find(m => m.id === marketId);
+    if (!market) return;
+    market.bets = market.bets.filter(b => b.id !== betId);
+    saveCustomMarkets();
+    renderCustomMarkets();
+    updateStats();
+    showToast('🗑️ Aposta removida');
+  }
+
+  function deleteCustomMarket(marketId) {
+    customMarkets = customMarkets.filter(m => m.id !== marketId);
+    saveCustomMarkets();
+    renderCustomMarkets();
+    updateStats();
+    showToast('🗑️ Mercado removido');
+  }
+
+  // ── RENDER CUSTOM MARKETS ──────────────────────────────────────────────────
+  function renderCustomMarkets() {
+    const section = document.getElementById('custom-markets-section');
+    const list    = document.getElementById('custom-markets-list');
+    const countEl = document.getElementById('custom-markets-count');
+
+    if (customMarkets.length === 0) {
+      section.style.display = 'none';
+      return;
+    }
+    section.style.display = 'block';
+    countEl.textContent = customMarkets.length + (customMarkets.length === 1 ? ' mercado' : ' mercados');
+
+    list.innerHTML = customMarkets.map(market => {
+      const betCount = market.bets.length;
+
+      // input field inside card
+      const inputField = market.type === 'numerico'
+        ? `<div class="form-group" style="flex:1;min-width:120px">
+             <label class="form-label">Sua resposta${market.unit ? ' (' + escapeHtml(market.unit) + ')' : ''}</label>
+             <input class="form-input" id="cbv-${market.id}" type="number" placeholder="Ex: 3" style="height:40px">
+           </div>`
+        : `<div class="form-group" style="flex:1;min-width:180px">
+             <label class="form-label">Escolha</label>
+             <div class="radio-group" id="cbr-${market.id}" style="flex-wrap:wrap">
+               ${market.options.map(o => `<div class="radio-opt" style="font-size:13px;padding:8px 10px" onclick="selectCustomRadio(this,'${market.id}')" data-value="${escapeHtml(o)}">${escapeHtml(o)}</div>`).join('')}
+             </div>
+           </div>`;
+
+      const betsHtml = betCount === 0
+        ? `<div style="font-size:13px;color:var(--muted);padding:8px 0">Nenhuma aposta ainda — seja o primeiro!</div>`
+        : market.bets.map(b => `
+            <div class="custom-bet-item">
+              <span class="cbi-name">${escapeHtml(b.nome)}</span>
+              <span class="cbi-value">${escapeHtml(b.display)}</span>
+              <span class="cbi-comment">${b.comment ? '"' + escapeHtml(b.comment) + '"' : ''}</span>
+              <span style="font-size:11px;color:var(--muted)">${b.timestamp}</span>
+              <button class="cbi-delete" onclick="deleteCustomBet('${market.id}', ${b.id})">✕</button>
+            </div>`).join('');
+
+      return `
+        <div class="custom-market-card" id="cmc-${market.id}">
+          <div class="custom-market-header">
+            <div style="flex:1">
+              <div class="custom-market-question">${escapeHtml(market.question)}</div>
+              <div class="custom-market-meta">
+                Criado por <strong>${escapeHtml(market.creator)}</strong> · ${market.timestamp}
+                ${market.desc ? ' · <em>' + escapeHtml(market.desc) + '</em>' : ''}
+                · <span style="color:var(--gold)">${betCount} aposta${betCount !== 1 ? 's' : ''}</span>
+              </div>
+            </div>
+            <div class="custom-market-actions">
+              <button class="bet-on-custom-btn" onclick="toggleCustomBetForm('${market.id}')">+ Apostar</button>
+              <button class="delete-btn" onclick="deleteCustomMarket('${market.id}')" title="Remover mercado">🗑</button>
+            </div>
+          </div>
+
+          <div class="custom-bet-form" id="cbf-${market.id}">
+            <div class="custom-bet-row">
+              <div class="form-group" style="min-width:130px">
+                <label class="form-label">Seu nome</label>
+                <input class="form-input" id="cbn-${market.id}" type="text" placeholder="Seu nome" maxlength="30" style="height:40px">
+              </div>
+              ${inputField}
+              <div class="form-group" style="flex:2;min-width:140px">
+                <label class="form-label">Comentário (opcional)</label>
+                <input class="form-input" id="cbc-${market.id}" type="text" placeholder="Sua previsão…" maxlength="80" style="height:40px">
+              </div>
+              <button class="custom-bet-submit" onclick="submitCustomBet('${market.id}')">✓ APOSTAR</button>
+            </div>
+          </div>
+
+          <div class="custom-bets-list">${betsHtml}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function selectCustomRadio(el, marketId) {
+    document.querySelectorAll(`#cbr-${marketId} .radio-opt`).forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ── RENDER MAIN BOARD ──────────────────────────────────────────────────────
+  function renderBoard() {
+    const body  = document.getElementById('board-body');
+    const empty = document.getElementById('empty-state');
+    const table = document.getElementById('board-table');
+    const tag   = document.getElementById('count-tag');
+
+    tag.textContent = bets.length + (bets.length === 1 ? ' aposta' : ' apostas');
+
+    if (bets.length === 0) {
+      empty.style.display = 'block';
+      table.style.display = 'none';
+      return;
+    }
+
+    empty.style.display = 'none';
+    table.style.display = 'table';
+
+    const marketLabels = { casamento: '💍 Casamento', duracao: '⏳ Duração', termino: '💔 Término' };
+    const badgeClass   = { casamento: 'badge-casamento', duracao: 'badge-duracao', termino: 'badge-termino' };
+
+    body.innerHTML = bets.map((bet, i) => `
+      <tr class="rank-${i+1}">
+        <td class="rank-num">${i+1}</td>
+        <td>
+          <div class="player-name">${escapeHtml(bet.nome)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${bet.timestamp}</div>
+        </td>
+        <td><span class="bet-type-badge ${badgeClass[bet.market]}">${marketLabels[bet.market]}</span></td>
+        <td><span class="bet-value">${escapeHtml(bet.display)}</span></td>
+        <td style="color:var(--muted);font-size:13px;font-style:italic">${bet.comentario ? '"' + escapeHtml(bet.comentario) + '"' : '—'}</td>
+        <td><span class="status-badge status-active">Ativa</span></td>
+        <td><button class="delete-btn" onclick="openModal(${i})">✕</button></td>
+      </tr>
+    `).join('');
+  }
+
+  // ── STATS ──────────────────────────────────────────────────────────────────
+  function updateStats() {
+    const allBets = [
+      ...bets,
+      ...customMarkets.flatMap(m => m.bets)
+    ];
+    document.getElementById('stat-total').textContent = allBets.length;
+    const names = new Set([
+      ...bets.map(b => b.nome.toLowerCase()),
+      ...customMarkets.flatMap(m => m.bets.map(b => b.nome.toLowerCase()))
+    ]);
+    document.getElementById('stat-apostadores').textContent = names.size;
+    document.getElementById('stat-mercados').textContent = 3 + customMarkets.length;
+  }
+
+  // ── DELETE (original) ─────────────────────────────────────────────────────
+  function openModal(idx) {
+    deleteIndex = idx;
+    document.getElementById('modal-overlay').classList.add('open');
+  }
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    deleteIndex = null;
+  }
+  function confirmDelete() {
+    if (deleteIndex !== null) {
+      bets.splice(deleteIndex, 1);
+      saveBets();
+      renderBoard();
+      updateStats();
+      showToast('🗑️ Aposta removida');
+    }
+    closeModal();
+  }
+
+  // ── TOAST ──────────────────────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ── STORAGE ────────────────────────────────────────────────────────────────
+  function saveBets()          { localStorage.setItem('polytrade_bets', JSON.stringify(bets)); }
+  function saveCustomMarkets() { localStorage.setItem('polytrade_custom_markets', JSON.stringify(customMarkets)); }
+
+  // ── UTILS ──────────────────────────────────────────────────────────────────
+  function escapeHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── INIT ───────────────────────────────────────────────────────────────────
+  renderBoard();
+  renderCustomMarkets();
+  updateStats();
+
+  document.getElementById('modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.getElementById('create-modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeCreateMarket();
+  });
+</script>
+</body>
+</html>
